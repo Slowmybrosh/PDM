@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ComprApp</string>
+    <string name="welcome">Bienvenido a esta aplicación</string>
+    <string name="take_photo">Take</string>
+</resources>
