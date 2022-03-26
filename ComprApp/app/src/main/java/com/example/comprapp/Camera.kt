@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,14 +15,10 @@ import androidx.core.content.ContextCompat
 import java.util.concurrent.Executors
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.PermissionChecker
 import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ExecutorService
-import android.provider.MediaStore
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
-import androidx.camera.core.impl.ImageCaptureConfig
+import com.example.comprapp.Scanner
 import com.example.comprapp.databinding.ActivityCameraBinding
 
 class Camera : AppCompatActivity() {
@@ -49,6 +46,7 @@ class Camera : AppCompatActivity() {
     }
 
     private fun takePhoto() {
+        Log.d("CamerApp","Se ha entrado")
         imageCapture.takePicture(cameraExecutor,
             object: ImageCapture.OnImageCapturedCallback(){ //Se llama cuando capturamos una imagen
                 override fun onError(exception: ImageCaptureException) { // Si hay errores
@@ -56,10 +54,16 @@ class Camera : AppCompatActivity() {
                 }
 
                 override fun onCaptureSuccess(image: ImageProxy) {
-                    Log.d("CamerApp","Se ha tomado una foto correctamente")
-                    //Convertir el image proxy a bitmap
-                    bitmap = imageProxyToBitmap(image)
                     super.onCaptureSuccess(image)
+                    Log.d("CamerApp","Se ha tomado una foto correctamente")
+                    //Procesamos y extraemos el código de barras
+                    val scanner: Scanner = Scanner()
+                    val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
+                    if (value != null){
+
+                    } else{
+                        Log.d("CamerApp","Error en el procesado de la imagen")
+                    }
                     image.close()
                 }
             }
@@ -105,14 +109,6 @@ class Camera : AppCompatActivity() {
                 finish()
             }
         }
-    }
-
-    private fun imageProxyToBitmap(image: ImageProxy): Bitmap{
-        val planeProxy = image.planes[0]
-        val buffer: ByteBuffer = planeProxy.buffer
-        val bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
     companion object {
