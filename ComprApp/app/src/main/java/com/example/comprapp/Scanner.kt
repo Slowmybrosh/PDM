@@ -12,7 +12,6 @@ import java.nio.ByteBuffer
 
 class Scanner{
     private var options = BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_EAN_13).build()
-    private var value: String? = null
 
     private fun getInstance(): BarcodeScanner{
         return BarcodeScanning.getClient(options)
@@ -23,14 +22,18 @@ class Scanner{
     }
 
     fun analyzeBarcode(image: ImageProxy, rotation: Int): String? {
-        Log.d("CamerApp","Se ha entrado a analizar el código de barras")
+        Log.d("ComprApp","Se ha entrado a analizar el código de barras")
         val input = InputImage.fromBitmap(imageProxyToBitmap(image), rotation)
         val barcode = getInstance()
-        val result = barcode.process(input).addOnSuccessListener { barcodes ->
-            for (barcode in barcodes) {
-                value = barcode.displayValue
+        var value: String? = null
+        barcode.process(input).addOnSuccessListener { barcodes ->
+                for (barcode in barcodes) {
+                    value = barcode.displayValue
+                }
             }
-        }
+            .addOnFailureListener{
+                Log.e("ComprApp","No se ha podido encontrar una código de barras")
+            }
 
         return value
     }

@@ -59,12 +59,12 @@ class Camera : AppCompatActivity() {
                     //Procesamos y extraemos el código de barras
                     val scanner: Scanner = Scanner()
                     val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
+                    image.close()
                     if (value != null){
 
                     } else{
-                        Log.d("CamerApp","Error en el procesado de la imagen")
+                        Log.d("ComprApp","Error en el procesado de la imagen")
                     }
-                    image.close()
                 }
             }
         )
