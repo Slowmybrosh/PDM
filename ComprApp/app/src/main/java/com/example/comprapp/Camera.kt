@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -55,16 +57,22 @@ class Camera : AppCompatActivity() {
 
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    Log.d("CamerApp","Se ha tomado una foto correctamente")
+
                     //Procesamos y extraemos el código de barras
                     val scanner: Scanner = Scanner()
                     val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
                     image.close()
-                    if (value != null){
 
+                    val data: Intent = Intent()
+
+                    if (value != null){
+                        data.data = Uri.parse(value)
+                        setResult(RESULT_OK,data)
                     } else{
-                        Log.d("ComprApp","Error en el procesado de la imagen")
+                        data.data = Uri.parse("-1")
+                        setResult(RESULT_CANCELED,data)
                     }
+                    finish()
                 }
             }
         )
