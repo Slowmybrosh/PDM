@@ -65,7 +65,7 @@ class Camera : AppCompatActivity() {
 
                     val data: Intent = Intent()
 
-                    if (value != null){
+                    if (value!!.isNotEmpty()){
                         data.data = Uri.parse(value)
                         setResult(RESULT_OK,data)
                     } else{

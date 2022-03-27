@@ -21,21 +21,29 @@ class Scanner{
         options = BarcodeScannerOptions.Builder().setBarcodeFormats(option).build()
     }
 
-    fun analyzeBarcode(image: ImageProxy, rotation: Int): String? {
+    fun analyzeBarcode(image: ImageProxy, rotation: Int): String {
         Log.d("ComprApp","Se ha entrado a analizar el código de barras")
         val input = InputImage.fromBitmap(imageProxyToBitmap(image), rotation)
         val barcode = getInstance()
-        var value: String? = null
-        barcode.process(input).addOnSuccessListener { barcodes ->
+        var barcodes = barcode.process(input)
+            .addOnSuccessListener { barcodes ->
                 for (barcode in barcodes) {
-                    value = barcode.displayValue
+                    Log.d("ComprApp", "Encontrado código: " + barcode.rawValue.toString())
                 }
             }
-            .addOnFailureListener{
-                Log.e("ComprApp","No se ha podido encontrar una código de barras")
-            }
 
-        return value
+        while(!barcodes.isComplete){}
+
+        var result = barcodes.result
+
+        return if(result.size == 1){
+            result[0].displayValue.toString()
+        } else{
+            //Raise Exception
+            ""
+        }
+
+
     }
 
     private fun imageProxyToBitmap(image: ImageProxy): Bitmap{
