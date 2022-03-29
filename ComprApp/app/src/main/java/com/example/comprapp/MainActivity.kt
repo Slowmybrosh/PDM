@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import com.example.comprapp.databinding.ActivityCameraBinding
 import com.example.comprapp.databinding.ActivityMainBinding
+import com.example.comprapp.Camera_action
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         val open_button = findViewById<Button>(R.id.button_camera)
         open_button.setOnClickListener{
             val intent = Intent(this, Camera::class.java)
+            intent.putExtra("action", Camera_action.BARCODE)
             startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
         }
     }
