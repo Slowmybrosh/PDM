@@ -1,39 +1,39 @@
 package com.example.comprapp
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import java.util.concurrent.Executors
-import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import java.nio.ByteBuffer
-import java.util.concurrent.ExecutorService
-import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
-import com.example.comprapp.Scanner
 import com.example.comprapp.databinding.ActivityCameraBinding
-import com.example.comprapp.Camera_action
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.math.roundToInt
 
 class Camera : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
     private lateinit var action: Camera_action
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var bitmap: Bitmap
+    private var Px = -1
+    private var Py = -1
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
+        viewBinding.resultChooser.visibility = View.GONE
         action = intent.getSerializableExtra("action") as Camera_action
         setContentView(viewBinding.root)
 
@@ -43,7 +43,15 @@ class Camera : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewBinding.imageCaptureButton.setOnClickListener{ takePhoto(action) }
+        viewBinding.viewFinder.setOnTouchListener{ v, event ->
+            if(event.action == MotionEvent.ACTION_DOWN){
+                Px = event.x.roundToInt()
+                Py = event.y.roundToInt()
+                takePhoto(action)
+            }
+            true
+        }
+
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         imageCapture = ImageCapture.Builder().setJpegQuality(100).setFlashMode(FLASH_MODE_AUTO).build()
@@ -58,25 +66,27 @@ class Camera : AppCompatActivity() {
 
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    val scanner: Scanner = Scanner()
-                    lateinit var value: String
+                    val scanner = Scanner()
+                    var data: Intent = Intent()
 
-                    value = if(action == Camera_action.BARCODE){
-                        //Procesamos y extraemos el código de barras
-                        scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
-                    } else {
-                        ""
+                    when (action) {
+                        Camera_action.BARCODE -> {
+                            val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
+                            if(value != null){
+                                data.data = Uri.parse(value)
+                                setResult(RESULT_OK,data)
+                            }
+                        }
+                        Camera_action.PRICE -> {
+                            val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
+                            if (recognizedText != null) {
+                                intent.putParcelableArrayListExtra("Text", ArrayList(recognizedText))
+                                setResult(RESULT_OK,data)
+                            }
+                        }
                     }
+
                     image.close()
-
-                    val data: Intent = Intent()
-                    if (value!!.isNotEmpty()){
-                        data.data = Uri.parse(value)
-                        setResult(RESULT_OK,data)
-                    } else{
-                        data.data = Uri.parse("-1")
-                        setResult(RESULT_CANCELED,data)
-                    }
                     finish()
                 }
             }

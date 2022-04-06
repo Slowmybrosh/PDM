@@ -1,12 +1,9 @@
 package com.example.comprapp
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import com.example.comprapp.databinding.ActivityCameraBinding
+import androidx.appcompat.app.AppCompatActivity
 import com.example.comprapp.databinding.ActivityMainBinding
-import com.example.comprapp.Camera_action
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,21 +14,28 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val open_button = findViewById<Button>(R.id.button_camera)
-        open_button.setOnClickListener{
-            val intent = Intent(this, Camera::class.java)
-            intent.putExtra("action", Camera_action.BARCODE)
-            startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
-        }
+//        val open_button = findViewById<Button>(R.id.button_camera)
+//        open_button.setOnClickListener{
+//            val intent = Intent(this, Camera::class.java)
+//            intent.putExtra("action", Camera_action.BARCODE)
+//            startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
+//        }
+
+//        viewBinding.priceButton.setOnClickListener{
+//            val intent = Intent(this, Camera::class.java)
+//            intent.putExtra("action", Camera_action.PRICE)
+//            startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
+//        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CAMERA_BARCODE){
             if(resultCode == RESULT_OK){
-                viewBinding.resultBarcode.text = data!!.dataString.toString()
+
             } else if(resultCode == RESULT_CANCELED){
-                viewBinding.resultBarcode.text = data!!.dataString.toString()
+
             }
         }
     }
