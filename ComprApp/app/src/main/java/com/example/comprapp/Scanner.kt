@@ -39,16 +39,6 @@ class Scanner{
 
         while(!barcodes.isComplete){}
 
-
-//        return if(result.size == 1){
-//            result[0].displayValue.toString()
-//        } else{
-//            //Raise Exception
-//            ""
-//        }
-
-
-
         for (barcode in barcodes.result){
                 return barcode.rawValue
         }
