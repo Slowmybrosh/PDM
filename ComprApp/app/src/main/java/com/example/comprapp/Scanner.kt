@@ -3,8 +3,6 @@ package com.example.comprapp
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.graphics.Point
-import android.os.Parcelable
 import android.util.Log
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanner
@@ -14,7 +12,6 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 
 class Scanner{
@@ -46,7 +43,7 @@ class Scanner{
         return null
     }
 
-    fun analyzeText(image: ImageProxy, rotation: Int): List<RecognizedText> {
+    fun analyzeText(image: ImageProxy, rotation: Int): Array<String> {
         val bitmap = imageRotateBitmap(imageProxyToBitmap(image),rotation)
         val input = InputImage.fromBitmap(bitmap,0)
         val recognizer = getRecognizerInstance()
@@ -57,16 +54,15 @@ class Scanner{
 
 
         while(!numbers.isComplete){}
-        val resultsList = mutableListOf<RecognizedText>()
+        val resultsList = ArrayList<String>()
         val regex = """\d+((\,|\.)\d{2,3})?""".toRegex()
         for(result in numbers.result.textBlocks){
             if(regex.containsMatchIn(result.text)){
-                var item = RecognizedText(regex.find(result.text)!!.value,result.cornerPoints)
-                resultsList.add(item)
+                resultsList.add(regex.find(result.text)!!.value)
             }
         }
 
-        return resultsList
+        return resultsList.toTypedArray()
 
     }
 
@@ -84,6 +80,3 @@ class Scanner{
         return Bitmap.createBitmap(image,0,0,image.width,image.height,matrix,false)
     }
 }
-
-@Parcelize
-data class Text(val name: String, val P1: Point, val P2: Point, val P3: Point, val P4: Point) : Parcelable

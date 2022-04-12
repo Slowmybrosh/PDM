@@ -15,32 +15,19 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val first = MainFragment()
-        val second = SecondFragment()
+        val main = MainFragment("Home")
+        val add = MainFragment("Add")
+        val history = SecondFragment()
 
-        setCurrentFragment(first)
+        setCurrentFragment(main)
         viewBinding.footer.setOnItemSelectedListener {
             when(it.itemId){
-                R.id.home -> setCurrentFragment(first)
-                R.id.settings -> setCurrentFragment(second)
-                R.id.add -> setCurrentFragment(second)
+                R.id.home -> setCurrentFragment(main)
+                R.id.settings -> setCurrentFragment(history) //cambiar esto por un historial de compras pasadas
+                R.id.add -> setCurrentFragment(add)
             }
             true
         }
-
-//        val open_button = findViewById<Button>(R.id.button_camera)
-//        open_button.setOnClickListener{
-//            val intent = Intent(this, Camera::class.java)
-//            intent.putExtra("action", Camera_action.BARCODE)
-//            startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
-//        }
-
-//        viewBinding.priceButton.setOnClickListener{
-//            val intent = Intent(this, Camera::class.java)
-//            intent.putExtra("action", Camera_action.PRICE)
-//            startActivityForResult(intent, REQUEST_CAMERA_BARCODE)
-//        }
-
     }
 
     private fun setCurrentFragment(fragment: Fragment) =

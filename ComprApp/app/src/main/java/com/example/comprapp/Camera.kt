@@ -8,8 +8,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
-import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
@@ -19,21 +19,17 @@ import androidx.core.content.ContextCompat
 import com.example.comprapp.databinding.ActivityCameraBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.roundToInt
 
 class Camera : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
     private lateinit var action: Camera_action
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: ExecutorService
-    private var Px = -1
-    private var Py = -1
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
-        viewBinding.resultChooser.visibility = View.GONE
         action = intent.getSerializableExtra("action") as Camera_action
         setContentView(viewBinding.root)
 
@@ -45,8 +41,6 @@ class Camera : AppCompatActivity() {
 
         viewBinding.viewFinder.setOnTouchListener{ v, event ->
             if(event.action == MotionEvent.ACTION_DOWN){
-                Px = event.x.roundToInt()
-                Py = event.y.roundToInt()
                 takePhoto(action)
             }
             true
@@ -67,7 +61,7 @@ class Camera : AppCompatActivity() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
                     val scanner = Scanner()
-                    var data: Intent = Intent()
+                    var data = Intent()
 
                     when (action) {
                         Camera_action.BARCODE -> {
@@ -75,19 +69,23 @@ class Camera : AppCompatActivity() {
                             if(value != null){
                                 data.data = Uri.parse(value)
                                 setResult(RESULT_OK,data)
+                                finish()
                             }
                         }
                         Camera_action.PRICE -> {
                             val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
+                            image.close()
                             if (recognizedText != null) {
-                                intent.putParcelableArrayListExtra("Text", ArrayList(recognizedText))
-                                setResult(RESULT_OK,data)
+                                val builder = AlertDialog.Builder(baseContext)
+                                builder.setTitle("Selecciona el precio correcto").setItems(recognizedText) { dialog, which ->
+                                    intent.putExtra("price", recognizedText[which])
+                                    setResult(RESULT_OK, data)
+                                    finish()
+                                }.create().show()
+
                             }
                         }
                     }
-
-                    image.close()
-                    finish()
                 }
             }
         )
