@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         val main = MainFragment("Home")
         val add = MainFragment("Add")
-        val history = SecondFragment()
+        val history = HistoryFragment()
 
         setCurrentFragment(main)
         viewBinding.footer.setOnItemSelectedListener {

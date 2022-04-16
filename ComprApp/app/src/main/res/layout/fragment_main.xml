@@ -9,18 +9,25 @@
 
     <TextView
         android:id="@+id/product_name"
-        android:layout_width="250dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:textSize="50dp"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="80dp"
-        tools:layout_editor_absoluteY="215dp" />
+        tools:ignore="MissingConstraints"/>
+
+    <TextView
+        android:id="@+id/product_price"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:textSize="50dp"
+        tools:ignore="MissingConstraints"/>
 
     <TextView
         android:id="@+id/product_image_url"
         android:layout_width="0dp"
         android:layout_height="0dp"
         tools:ignore="MissingConstraints" />
+
+
 
     <ImageView
         android:id="@+id/product_image"
@@ -55,22 +62,20 @@
         android:layout_marginBottom="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        fab:fab_addButtonSize="normal">
+        fab:fab_addButtonSize="normal"
+        fab:fab_icon="@drawable/ic_more_foreground">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fabSize="mini"
-            fab:fab_icon="@drawable/ic_done_foreground"
-            fab:fab_title="Terminar" />
+            fab:fab_icon="@drawable/ic_done_foreground"/>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add"
             android:layout_width="2dp"
             android:layout_height="2dp"
-            fab:fab_icon="@drawable/ic_add_foreground"
-            fab:fab_title="Añadir producto" />
+            fab:fab_icon="@drawable/ic_add_foreground"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

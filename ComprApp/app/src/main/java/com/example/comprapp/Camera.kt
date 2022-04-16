@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
@@ -66,6 +65,7 @@ class Camera : AppCompatActivity() {
                     when (action) {
                         Camera_action.BARCODE -> {
                             val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
+                            image.close()
                             if(value != null){
                                 data.data = Uri.parse(value)
                                 setResult(RESULT_OK,data)
@@ -76,13 +76,11 @@ class Camera : AppCompatActivity() {
                             val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
                             image.close()
                             if (recognizedText != null) {
-                                val builder = AlertDialog.Builder(baseContext)
-                                builder.setTitle("Selecciona el precio correcto").setItems(recognizedText) { dialog, which ->
-                                    intent.putExtra("price", recognizedText[which])
-                                    setResult(RESULT_OK, data)
-                                    finish()
-                                }.create().show()
 
+                                val array: ArrayList<String> = ArrayList(recognizedText.asList())
+                                data.putStringArrayListExtra("prices",array)
+                                setResult(RESULT_OK,data)
+                                finish()
                             }
                         }
                     }

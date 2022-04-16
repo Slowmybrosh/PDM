@@ -2,20 +2,24 @@ package com.example.comprapp
 
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.comprapp.databinding.FragmentMainBinding
 import com.getbase.floatingactionbutton.FloatingActionButton
+
 
 class MainFragment(private val action: String):Fragment(R.layout.fragment_main) {
     private var lastPurchase = mutableListOf<PurchaseModel>()
     private lateinit var viewBinding: FragmentMainBinding
     private lateinit var temp_barcode: String
+    private lateinit var temp_name: String
+    private lateinit var temp_image: String
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -24,11 +28,13 @@ class MainFragment(private val action: String):Fragment(R.layout.fragment_main) 
         val fab_menu = viewBinding.menuFab
 
         val rvPurchase = viewBinding.rvPurchase
-        rvPurchase.adapter = PurchaseAdapter(lastPurchase)
 
-        if(action == "Home"){
+        if(action == "Home"){ //TODO Cambiar lo de Action por un enum
             viewBinding.textViewRv.text = "Ultima compra"
             fab_menu.visibility = View.GONE
+            val database = DatabaseAdapter(context)
+            if(database.getLastPurchase() != null) lastPurchase = database.getLastPurchase()!!
+
         }
 
         if(action == "Add"){
@@ -36,9 +42,10 @@ class MainFragment(private val action: String):Fragment(R.layout.fragment_main) 
             fab_menu.visibility = View.VISIBLE
 
             fab_menu.findViewById<FloatingActionButton>(R.id.fab_done).setOnClickListener{
-                //TODO llamar a la database para guardar la compra
                 val database = DatabaseAdapter(context)
-                viewBinding = database.searchBarcode("8480000141576", viewBinding)
+                //database.savePurchase(lastPurchase)
+                //database.searchBarcode("8480000160447", viewBinding)
+                //choosePrice()
             }
             fab_menu.findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener{
                 val intent = Intent(activity, Camera::class.java)
@@ -47,6 +54,8 @@ class MainFragment(private val action: String):Fragment(R.layout.fragment_main) 
             }
         }
 
+        rvPurchase.layoutManager = LinearLayoutManager(context)
+        rvPurchase.adapter = PurchaseAdapter(lastPurchase, action)
 
         return viewBinding.root
     }
@@ -58,16 +67,39 @@ class MainFragment(private val action: String):Fragment(R.layout.fragment_main) 
             val database = DatabaseAdapter(context)
             database.searchBarcode(temp_barcode, viewBinding)
 
-            if(viewBinding.productName.text != ""){
-                val intent = Intent(activity, Camera::class.java)
-                intent.putExtra("action", Camera_action.PRICE)
-                startActivityForResult(intent, REQUEST_PRICE)
-            }
+            val intent = Intent(activity, Camera::class.java)
+            intent.putExtra("action", Camera_action.PRICE)
+            startActivityForResult(intent, REQUEST_PRICE)
         }
         if(requestCode == REQUEST_PRICE && resultCode == Activity.RESULT_OK){
-            lastPurchase.add(PurchaseModel(viewBinding.productImage.drawable.toBitmap(),viewBinding.productName.text.toString(), data!!.getStringExtra("price").toString(),temp_barcode))
-            viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size - 1 )
+            var array = data!!.getStringArrayListExtra("prices")
+            choosePrice(array!!.toMutableList().toTypedArray())
+            //val byteArrayOutputStream = ByteArrayOutputStream()
+            //viewBinding.productImage.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+            //val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+            //temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            //
+            //lastPurchase.add(PurchaseModel(temp_image,temp_name, data!!.getStringExtra("price").toString(),temp_barcode))
+            //viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
         }
+    }
+
+    private fun choosePrice(prices: Array<String>){
+        prices[prices.size - 1] = "No está el precio"
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Selecciona el precio")
+
+        builder.setItems(prices) { dialog, which ->
+            viewBinding.productPrice.text = prices[which]
+        }
+
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun manualPriceSelector(){
+
     }
 
     companion object{
