@@ -15,11 +15,12 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val main = MainFragment("Home")
-        val add = MainFragment("Add")
+        val main = MainFragment(MainFragmentAction.HOME)
+        val add = MainFragment(MainFragmentAction.ADD)
         val history = HistoryFragment()
 
         setCurrentFragment(main)
+
         viewBinding.footer.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.home -> setCurrentFragment(main)

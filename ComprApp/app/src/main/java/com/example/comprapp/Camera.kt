@@ -21,7 +21,7 @@ import java.util.concurrent.Executors
 
 class Camera : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
-    private lateinit var action: Camera_action
+    private lateinit var action: CameraAction
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: ExecutorService
 
@@ -29,7 +29,7 @@ class Camera : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
-        action = intent.getSerializableExtra("action") as Camera_action
+        action = intent.getSerializableExtra("action") as CameraAction
         setContentView(viewBinding.root)
 
         if(allPermissionsGranted()){
@@ -50,7 +50,7 @@ class Camera : AppCompatActivity() {
         imageCapture = ImageCapture.Builder().setJpegQuality(100).setFlashMode(FLASH_MODE_AUTO).build()
     }
 
-    private fun takePhoto(action: Camera_action) {
+    private fun takePhoto(action: CameraAction) {
         imageCapture.takePicture(cameraExecutor,
             object: ImageCapture.OnImageCapturedCallback(){ //Se llama cuando capturamos una imagen
                 override fun onError(exception: ImageCaptureException) { // Si hay errores
@@ -63,7 +63,7 @@ class Camera : AppCompatActivity() {
                     var data = Intent()
 
                     when (action) {
-                        Camera_action.BARCODE -> {
+                        CameraAction.BARCODE -> {
                             val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
                             image.close()
                             if(value != null){
@@ -72,7 +72,7 @@ class Camera : AppCompatActivity() {
                                 finish()
                             }
                         }
-                        Camera_action.PRICE -> {
+                        CameraAction.PRICE -> {
                             val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
                             image.close()
                             if (recognizedText != null) {

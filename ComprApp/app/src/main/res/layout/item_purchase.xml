@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_horizontal"
+
     android:paddingTop="10dp"
     android:paddingBottom="10dp">
 
@@ -51,5 +51,12 @@
         android:layout_height="35dp"
         android:layout_marginLeft="25dp"
         android:src="@drawable/ic_delete_foreground" />
+
+    <ImageButton
+        android:id="@+id/add_one"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="25dp"
+        android:src="@drawable/ic_copy_foreground" />
 
 </LinearLayout>

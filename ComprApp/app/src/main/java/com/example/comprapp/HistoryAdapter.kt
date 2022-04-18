@@ -1,6 +1,7 @@
 package com.example.comprapp
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import java.io.File
 import java.util.*
 
 class HistoryAdapter(private val history: MutableList<File>, private val context : Context?) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
+    private lateinit var database : Database
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateTextView = itemView.findViewById<TextView>(R.id.date_name)
@@ -28,6 +30,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         val context = parent.context
         val inflater = LayoutInflater.from(context)
         val historyView = inflater.inflate(R.layout.item_history, parent, false)
+        database = Database(context)
 
         return ViewHolder(historyView)
     }
@@ -37,7 +40,6 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         val purchase = history[position]
 
         viewHolder.itemView.setOnLongClickListener{
-            val database = DatabaseAdapter(context)
             val inflater = context!!.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val detailView = inflater.inflate(R.layout.popup_history, null)
             val popup = PopupWindow(detailView, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
@@ -45,7 +47,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
 
 
             detailView.findViewById<RecyclerView>(R.id.rv_detail_history).layoutManager = LinearLayoutManager(context)
-            detailView.findViewById<RecyclerView>(R.id.rv_detail_history).adapter = PurchaseAdapter(detailPurchase, "Home")
+            detailView.findViewById<RecyclerView>(R.id.rv_detail_history).adapter = PurchaseAdapter(detailPurchase, MainFragmentAction.HOME)
             popup.isOutsideTouchable = true
             popup.showAtLocation(detailView, Gravity.CENTER, 0, 0)
             detailView.findViewById<Button>(R.id.popup_window_button).setOnClickListener{
@@ -56,10 +58,10 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         viewHolder.dateTextView.text = parseName(purchase)
         viewHolder.priceTextView.text = String.format("%.2f",getTotalPrice(purchase))
         viewHolder.deleteButton.setOnClickListener{
-            //TODO Meter aqui una confirmación para no liarla
-            removeFile(history[viewHolder.adapterPosition])
-            history.remove(history[viewHolder.adapterPosition])
-            notifyItemRemoved(viewHolder.adapterPosition)
+            if(removeFile(history[viewHolder.adapterPosition])){
+                history.remove(history[viewHolder.adapterPosition])
+                notifyItemRemoved(viewHolder.adapterPosition)
+            }
         }
 
     }
@@ -73,7 +75,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
     }
 
     private fun getTotalPrice(archivo: File) : Float{
-        val database = DatabaseAdapter(context)
+        //val database = Database(context)
         val purchase = database.getPurchase(archivo)
         var total = 0.0
 
@@ -85,8 +87,16 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         return total.toFloat()
     }
 
-    private fun removeFile(archivo: File){
-        val database = DatabaseAdapter(context)
-        database.removeFile(archivo)
+    private fun removeFile(archivo: File) : Boolean{
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Eliminar compra")
+        builder.setMessage("¿Está seguro de que quiere eliminar la compra?")
+        builder.setPositiveButton("Si"){_,_ -> database.removeFile(archivo)}
+        builder.setNegativeButton("No") {_,_ ->}
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        return archivo.exists()
     }
 }

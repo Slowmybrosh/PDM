@@ -1,8 +1,11 @@
 package com.example.comprapp
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
+import android.widget.ImageView
 import com.android.volley.Request
+import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.comprapp.databinding.FragmentMainBinding
@@ -13,10 +16,11 @@ import java.io.File
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
-class DatabaseAdapter(private val context: Context?) {
+
+class Database(private val context: Context?) {
     private var requestQueue = Volley.newRequestQueue(context)
 
-    fun searchBarcode(barcode: String, viewBinding: FragmentMainBinding){
+    fun searchBarcode(barcode: String, viewBinding: FragmentMainBinding, callback: MainFragment.VolleyCallback){
         val regex = "^[0-9]{13}$".toRegex()
         var url = "https://world.openfoodfacts.org/api/v0/product/$barcode.json"
         if (regex.matches(barcode)) {
@@ -27,10 +31,13 @@ class DatabaseAdapter(private val context: Context?) {
 
                         viewBinding.productName.text = json_array.getString("product_name")
                         viewBinding.productImageUrl.text = json_array.getString("image_front_small_url")
+                        Log.d("ComprApp", "Se ha recibido la respuesta del código de barras")
+                        callback.onSuccess("barcode")
+
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
-                }, { error -> Log.e("ComprApp", error.toString()) })
+                }) { e -> e.printStackTrace() }
             requestQueue.add(request)
         }
     }
@@ -69,5 +76,17 @@ class DatabaseAdapter(private val context: Context?) {
         archivo.delete()
     }
 
+    fun requestProductImage(url: String, viewBinding: FragmentMainBinding, callback: MainFragment.VolleyCallback){
+        if(url != ""){
+            val imageRequest = ImageRequest(url,{
+                bitmap ->
+                viewBinding.productImage.setImageBitmap(bitmap)
+                callback.onSuccess("Imagen")
+            }, 0, 0, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888, {
+                error -> error.printStackTrace()
+            })
+            requestQueue.add(imageRequest)
+        }
+    }
 
 }

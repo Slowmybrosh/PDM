@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private val action: String) : RecyclerView.Adapter<PurchaseAdapter.ViewHolder>() {
+class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private val action: MainFragmentAction) : RecyclerView.Adapter<PurchaseAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val nameTextView = itemView.findViewById<TextView>(R.id.purchase_name)
@@ -18,6 +18,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         //val barcodeTextView = itemView.findViewById<TextView>(R.id.purchase_barcode)
         val imageView = itemView.findViewById<ImageView>(R.id.purchase_image)
         val deleteButton = itemView.findViewById<ImageButton>(R.id.delete)
+        val add_item = itemView.findViewById<ImageButton>(R.id.add_one)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseAdapter.ViewHolder {
@@ -39,8 +40,12 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
             groceries.remove(groceries[viewHolder.adapterPosition])
             notifyItemRemoved(viewHolder.adapterPosition)
         }
+        viewHolder.add_item.setOnClickListener{
+            groceries.add(groceries[viewHolder.adapterPosition])
+            notifyItemInserted(groceries.size)
+        }
 
-        if(action == "Add")
+        if(action == MainFragmentAction.ADD)
             viewHolder.deleteButton.visibility = View.VISIBLE
         else
             viewHolder.deleteButton.visibility = View.GONE

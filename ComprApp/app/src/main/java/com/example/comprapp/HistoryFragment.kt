@@ -14,7 +14,7 @@ class HistoryFragment:Fragment(R.layout.fragment_second) {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        val database = DatabaseAdapter(context)
+        val database = Database(context)
 
         viewBinding = FragmentSecondBinding.inflate(layoutInflater)
         viewBinding.historyMain.foreground.alpha = 0

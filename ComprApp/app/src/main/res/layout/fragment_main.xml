@@ -27,17 +27,26 @@
         android:layout_height="0dp"
         tools:ignore="MissingConstraints" />
 
-
-
     <ImageView
         android:id="@+id/product_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
         tools:ignore="MissingConstraints" />
 
+    <ImageButton
+        android:id="@+id/change_mode"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginEnd="25dp"
+        android:src="@drawable/ic_change_foreground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/text_view_rv"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/text_view_rv"
-        android:layout_width="300dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp"
@@ -57,11 +66,11 @@
         android:id="@+id/menu_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_marginRight="15dp"
+        android:layout_gravity="start|bottom"
+        android:layout_marginLeft="15dp"
         android:layout_marginBottom="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sum_price"
+        app:layout_constraintStart_toStartOf="parent"
         fab:fab_addButtonSize="normal"
         fab:fab_icon="@drawable/ic_more_foreground">
 
@@ -77,5 +86,35 @@
             android:layout_height="2dp"
             fab:fab_icon="@drawable/ic_add_foreground"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+    <TextView
+        android:id="@+id/mode"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:textSize="18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/sum_price"/>
+
+    <TextView
+        android:id="@+id/sum_price"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:textAlignment="textEnd"
+        android:text="Precio total:"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/sum_price_num"/>
+
+    <TextView
+        android:id="@+id/sum_price_num"
+        android:layout_width="75dp"
+        android:layout_height="50dp"
+        android:textAlignment="textEnd"
+        android:textSize="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
