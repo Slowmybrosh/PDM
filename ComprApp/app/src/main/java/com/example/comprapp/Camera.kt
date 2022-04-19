@@ -1,39 +1,44 @@
 package com.example.comprapp
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.*
+import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import java.util.concurrent.Executors
-import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.PermissionChecker
-import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.ExecutorService
-import android.provider.MediaStore
-import androidx.camera.core.ImageCapture.FLASH_MODE_AUTO
-import androidx.camera.core.impl.ImageCaptureConfig
 import com.example.comprapp.databinding.ActivityCameraBinding
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+/**
+ * Clase que contiene la cámara de la aplicación. Esta se usa para detectar códigos de barras y etiquetas de precio
+ *
+ * @property viewBinding contiene la vista para acceder rápidamente a los elementos de la misma
+ * @property action acción de la cámara, puede ser abierta para detectar un código de barras o una etiqueta con el precio
+ * @property imageCapture captura de imágenes
+ * @property cameraExecutor hebra que controla la cámara
+ */
 
 class Camera : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
-
+    private lateinit var action: CameraAction
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var bitmap: Bitmap
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
+        action = intent.getSerializableExtra("action") as CameraAction
         setContentView(viewBinding.root)
 
         if(allPermissionsGranted()){
@@ -42,13 +47,24 @@ class Camera : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewBinding.imageCaptureButton.setOnClickListener{ takePhoto() }
+        viewBinding.viewFinder.setOnTouchListener{ v, event ->
+            if(event.action == MotionEvent.ACTION_DOWN){
+                takePhoto(action)
+            }
+            true
+        }
+
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         imageCapture = ImageCapture.Builder().setJpegQuality(100).setFlashMode(FLASH_MODE_AUTO).build()
     }
 
-    private fun takePhoto() {
+    /**
+     * Obtener foto
+     *
+     * @param action contexto en el que se ha abierto la cámara: Barcode o Price
+     */
+    private fun takePhoto(action: CameraAction) {
         imageCapture.takePicture(cameraExecutor,
             object: ImageCapture.OnImageCapturedCallback(){ //Se llama cuando capturamos una imagen
                 override fun onError(exception: ImageCaptureException) { // Si hay errores
@@ -56,16 +72,40 @@ class Camera : AppCompatActivity() {
                 }
 
                 override fun onCaptureSuccess(image: ImageProxy) {
-                    Log.d("CamerApp","Se ha tomado una foto correctamente")
-                    //Convertir el image proxy a bitmap
-                    bitmap = imageProxyToBitmap(image)
                     super.onCaptureSuccess(image)
-                    image.close()
+                    val scanner = Scanner()
+                    var data = Intent()
+
+                    when (action) {
+                        CameraAction.BARCODE -> {
+                            val value = scanner.analyzeBarcode(image,image.imageInfo.rotationDegrees)
+                            image.close()
+                            if(value != null){
+                                data.data = Uri.parse(value)
+                                setResult(RESULT_OK,data)
+                                finish()
+                            }
+                        }
+                        CameraAction.PRICE -> {
+                            val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
+                            image.close()
+                            if (recognizedText != null) {
+
+                                val array: ArrayList<String> = ArrayList(recognizedText.asList())
+                                data.putStringArrayListExtra("prices",array)
+                                setResult(RESULT_OK,data)
+                                finish()
+                            }
+                        }
+                    }
                 }
             }
         )
     }
 
+    /**
+     * Abrir la cámara para hacer una foto
+     */
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -74,10 +114,8 @@ class Camera : AppCompatActivity() {
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try{
-                //Unbind por si acaso
                 cameraProvider.unbindAll()
 
-                //Vuelta a bindear
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
             }
             catch(exc: Exception){
@@ -86,6 +124,9 @@ class Camera : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    /**
+     * Comprobar si se han obtenido todos los permisos
+     */
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
@@ -105,14 +146,6 @@ class Camera : AppCompatActivity() {
                 finish()
             }
         }
-    }
-
-    private fun imageProxyToBitmap(image: ImageProxy): Bitmap{
-        val planeProxy = image.planes[0]
-        val buffer: ByteBuffer = planeProxy.buffer
-        val bytes = ByteArray(buffer.remaining())
-        buffer.get(bytes)
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
     companion object {

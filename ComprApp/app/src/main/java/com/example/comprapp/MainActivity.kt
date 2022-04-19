@@ -1,21 +1,48 @@
 package com.example.comprapp
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.example.comprapp.databinding.ActivityMainBinding
+
+/**
+ * Clase que contiene la actividad principal
+ * @property viewBinding contiene la vista para acceder rápidamente a los elementos de la misma
+ */
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var viewBinding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        val open_button = findViewById<Button>(R.id.button_camera)
-        open_button.setOnClickListener{
-            val intent = Intent(this, Camera::class.java)
-            startActivity(intent)
+        val main = MainFragment(MainFragmentAction.HOME)
+        val add = MainFragment(MainFragmentAction.ADD)
+        val history = HistoryFragment()
+
+        setCurrentFragment(main)
+
+        viewBinding.footer.setOnItemSelectedListener {
+            when(it.itemId){
+                R.id.home -> setCurrentFragment(main)
+                R.id.settings -> setCurrentFragment(history) //TODO cambiar icono y nombre
+                R.id.add -> setCurrentFragment(add)
+            }
+            true
         }
     }
+
+    /**
+     * Establece el fragmento que se muestra en el contenedor
+     *
+     * @param fragment fragmento a mostrar
+     */
+    private fun setCurrentFragment(fragment: Fragment) =
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFragment,fragment)
+            commit()
+        }
 }
