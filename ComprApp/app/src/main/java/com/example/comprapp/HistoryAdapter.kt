@@ -17,6 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.util.*
 
+/**
+ * Adaptador para la vista del historial. Contiene una lista con los ficheros de compras pasadas
+ *
+ * @param history lista de ficheros con compras pasadas
+ * @param context contexto de la aplicación
+ */
 class HistoryAdapter(private val history: MutableList<File>, private val context : Context?) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
     private lateinit var database : Database
 
@@ -47,7 +53,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
 
 
             detailView.findViewById<RecyclerView>(R.id.rv_detail_history).layoutManager = LinearLayoutManager(context)
-            detailView.findViewById<RecyclerView>(R.id.rv_detail_history).adapter = PurchaseAdapter(detailPurchase, MainFragmentAction.HOME)
+            detailView.findViewById<RecyclerView>(R.id.rv_detail_history).adapter = PurchaseAdapter(detailPurchase, MainFragmentAction.HOME, object: MainFragment.UpdateList{})
             popup.isOutsideTouchable = true
             popup.showAtLocation(detailView, Gravity.CENTER, 0, 0)
             detailView.findViewById<Button>(R.id.popup_window_button).setOnClickListener{
@@ -56,7 +62,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
             true
         }
         viewHolder.dateTextView.text = parseName(purchase)
-        viewHolder.priceTextView.text = String.format("%.2f",getTotalPrice(purchase))
+        viewHolder.priceTextView.text = if (getTotalPrice(purchase) > 0) String.format("%.2f",getTotalPrice(purchase)) else "Futura compra"
         viewHolder.deleteButton.setOnClickListener{
             if(removeFile(history[viewHolder.adapterPosition])){
                 history.remove(history[viewHolder.adapterPosition])
@@ -66,14 +72,30 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
 
     }
 
+    /**
+     * Obtener el número de elementos de la lista de ficheros
+     *
+     * @return tamaño de la lista
+     */
     override fun getItemCount(): Int {
         return history.size
     }
 
+    /**
+     * Parsea el nombre del fichero
+     *
+     * @param archivo archivo del que se va a parsear el nombre
+     * @return la fecha cuando se realizó la compra
+     */
     private fun parseName(archivo: File) : String{
         return Date(archivo.lastModified()).toString()
     }
 
+    /**
+     * Obtener el precio total de la compra
+     *
+     * @param archivo compra de la que se calcula el precio total
+     */
     private fun getTotalPrice(archivo: File) : Float{
         //val database = Database(context)
         val purchase = database.getPurchase(archivo)
@@ -87,6 +109,11 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         return total.toFloat()
     }
 
+    /**
+     * Eliminar fichero. Crea un dialogo de texto para confirmar la eliminación del fichero
+     *
+     * @param archivo archivo que se va a eliminar
+     */
     private fun removeFile(archivo: File) : Boolean{
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Eliminar compra")

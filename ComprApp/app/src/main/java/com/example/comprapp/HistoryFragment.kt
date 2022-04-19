@@ -9,6 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.comprapp.databinding.FragmentSecondBinding
 
+/**
+ * clase que contiene el fragmento que tiene un historial de compras pasadas
+ *
+ * @param viewBinding contiene la vista para acceder rápidamente a los elementos de la misma
+ */
+
 class HistoryFragment:Fragment(R.layout.fragment_second) {
     private lateinit var viewBinding: FragmentSecondBinding
 

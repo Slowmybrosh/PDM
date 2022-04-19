@@ -1,5 +1,8 @@
 package com.example.comprapp
 
-public enum class CameraAction {
+/**
+ * Enum para establecer el contexto de la cámara. Puede ser barcode o price
+ */
+enum class CameraAction {
     BARCODE, PRICE
 }

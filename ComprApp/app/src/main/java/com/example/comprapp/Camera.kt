@@ -19,6 +19,15 @@ import com.example.comprapp.databinding.ActivityCameraBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+/**
+ * Clase que contiene la cámara de la aplicación. Esta se usa para detectar códigos de barras y etiquetas de precio
+ *
+ * @property viewBinding contiene la vista para acceder rápidamente a los elementos de la misma
+ * @property action acción de la cámara, puede ser abierta para detectar un código de barras o una etiqueta con el precio
+ * @property imageCapture captura de imágenes
+ * @property cameraExecutor hebra que controla la cámara
+ */
+
 class Camera : AppCompatActivity() {
     private lateinit var viewBinding: ActivityCameraBinding
     private lateinit var action: CameraAction
@@ -50,6 +59,11 @@ class Camera : AppCompatActivity() {
         imageCapture = ImageCapture.Builder().setJpegQuality(100).setFlashMode(FLASH_MODE_AUTO).build()
     }
 
+    /**
+     * Obtener foto
+     *
+     * @param action contexto en el que se ha abierto la cámara: Barcode o Price
+     */
     private fun takePhoto(action: CameraAction) {
         imageCapture.takePicture(cameraExecutor,
             object: ImageCapture.OnImageCapturedCallback(){ //Se llama cuando capturamos una imagen
@@ -89,6 +103,9 @@ class Camera : AppCompatActivity() {
         )
     }
 
+    /**
+     * Abrir la cámara para hacer una foto
+     */
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -97,10 +114,8 @@ class Camera : AppCompatActivity() {
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try{
-                //Unbind por si acaso
                 cameraProvider.unbindAll()
 
-                //Vuelta a bindear
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
             }
             catch(exc: Exception){
@@ -109,6 +124,9 @@ class Camera : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    /**
+     * Comprobar si se han obtenido todos los permisos
+     */
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
