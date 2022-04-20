@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -47,16 +48,19 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
             notifyItemRemoved(viewHolder.adapterPosition)
             callback.itemChanged()
         }
+        viewHolder.deleteButton.setOnLongClickListener {
+            Toast.makeText(viewHolder.itemView.context, "Eliminar elemento", Toast.LENGTH_SHORT)
+            true
+        }
         viewHolder.add_item.setOnClickListener{
             groceries.add(groceries[viewHolder.adapterPosition])
             notifyItemInserted(groceries.size)
             callback.itemChanged()
         }
-
-        if(action == MainFragmentAction.ADD)
-            viewHolder.deleteButton.visibility = View.VISIBLE
-        else
-            viewHolder.deleteButton.visibility = View.GONE
+        viewHolder.add_item.setOnLongClickListener {
+            Toast.makeText(viewHolder.itemView.context, "Duplicar elemento", Toast.LENGTH_SHORT)
+            true
+        }
     }
 
     /**

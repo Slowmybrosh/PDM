@@ -96,6 +96,10 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
                 Toast.makeText(context,"Se ha cambiado el modo a 'Futura compra'", Toast.LENGTH_LONG).show()
             }
         }
+        viewBinding.changeMode.setOnLongClickListener {
+            Toast.makeText(context,"Cambiar modo", Toast.LENGTH_SHORT)
+            true
+        }
 
         viewBinding.loadFile.setOnClickListener {
             if(database.getLastPurchase() != null){
@@ -103,6 +107,10 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
                 viewBinding.rvPurchase.adapter?.notifyItemRangeInserted(0,lastPurchase.size)
                 updateTotalPrice()
             }
+        }
+        viewBinding.loadFile.setOnLongClickListener {
+            Toast.makeText(context,"Cargar última compra", Toast.LENGTH_SHORT)
+            true
         }
 
         return viewBinding.root

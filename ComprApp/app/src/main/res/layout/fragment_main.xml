@@ -69,7 +69,7 @@
         android:id="@+id/rvPurchase"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/sum_price_num"
         app:layout_constraintTop_toBottomOf="@+id/text_view_rv" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
