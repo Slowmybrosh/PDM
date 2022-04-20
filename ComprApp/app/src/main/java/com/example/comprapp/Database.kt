@@ -86,11 +86,22 @@ class Database(private val context: Context?) {
     fun getLastPurchase(): MutableList<PurchaseModel>? {
         val dir = File(context?.filesDir!!.path)
         var lastModified: Long = -1
-        var path = ""
+        var file: File? = null
         if (dir.walk().iterator().hasNext() && dir.walk().toList().last().isFile) {
-            val lastFile = dir.walk().toList().last()
+            dir.walk().forEach {
+                val lastModifyTemp = it.lastModified()
+                val name = it.name
+                if(file == null && it.isFile){
+                    lastModified = it.lastModified()
+                    file = it
+                }
+                if (lastModified < it.lastModified() && it.isFile){
+                    lastModified = it.lastModified()
+                    file = it
+                }
+            }
             val mutableListType = object : TypeToken<MutableList<PurchaseModel>>() {}.type
-            return Gson().fromJson(lastFile.readText(), mutableListType)
+            return Gson().fromJson(file!!.readText(), mutableListType)
         }
         return null
 

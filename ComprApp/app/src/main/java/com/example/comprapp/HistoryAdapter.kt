@@ -7,10 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -69,6 +66,10 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
                 notifyItemRemoved(viewHolder.adapterPosition)
             }
         }
+        viewHolder.deleteButton.setOnLongClickListener {
+            Toast.makeText(viewHolder.itemView.context, "Eliminar compra", Toast.LENGTH_SHORT)
+            true
+        }
 
     }
 
@@ -97,7 +98,6 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
      * @param archivo compra de la que se calcula el precio total
      */
     private fun getTotalPrice(archivo: File) : Float{
-        //val database = Database(context)
         val purchase = database.getPurchase(archivo)
         var total = 0.0
 

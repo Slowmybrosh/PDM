@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -33,6 +32,7 @@ class Camera : AppCompatActivity() {
     private lateinit var action: CameraAction
     private lateinit var imageCapture: ImageCapture
     private lateinit var cameraExecutor: ExecutorService
+    private var scanner = Scanner()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,18 +41,14 @@ class Camera : AppCompatActivity() {
         action = intent.getSerializableExtra("action") as CameraAction
         setContentView(viewBinding.root)
 
+        viewBinding.textCamera.text = if (action == CameraAction.BARCODE) "Capturar Código de barras" else "Capturar precio"
         if(allPermissionsGranted()){
             startCamera()
         } else{
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
 
-        viewBinding.viewFinder.setOnTouchListener{ v, event ->
-            if(event.action == MotionEvent.ACTION_DOWN){
-                takePhoto(action)
-            }
-            true
-        }
+        viewBinding.captureButton.setOnClickListener { takePhoto(action) }
 
 
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -73,7 +69,6 @@ class Camera : AppCompatActivity() {
 
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    val scanner = Scanner()
                     var data = Intent()
 
                     when (action) {

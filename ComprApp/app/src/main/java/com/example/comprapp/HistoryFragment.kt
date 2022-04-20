@@ -23,7 +23,6 @@ class HistoryFragment:Fragment(R.layout.fragment_second) {
         val database = Database(context)
 
         viewBinding = FragmentSecondBinding.inflate(layoutInflater)
-        viewBinding.historyMain.foreground.alpha = 0
 
         val rvHistory = viewBinding.rvHistory
 
