@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -59,7 +60,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
             true
         }
         viewHolder.dateTextView.text = parseName(purchase)
-        viewHolder.priceTextView.text = if (getTotalPrice(purchase) > 0) String.format("%.2f",getTotalPrice(purchase)) else "Futura compra"
+        viewHolder.priceTextView.text = if (getTotalPrice(purchase) > 0) String.format("%.2f",getTotalPrice(purchase)) + "€" else "Futura compra"
         viewHolder.deleteButton.setOnClickListener{
             if(removeFile(history[viewHolder.adapterPosition])){
                 history.remove(history[viewHolder.adapterPosition])
@@ -89,7 +90,10 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
      * @return la fecha cuando se realizó la compra
      */
     private fun parseName(archivo: File) : String{
-        return Date(archivo.lastModified()).toString()
+        var date = Date(archivo.lastModified())
+        val format = SimpleDateFormat("dd-MMMM-yyyy")
+
+        return format.format(date).replace("-"," ")
     }
 
     /**

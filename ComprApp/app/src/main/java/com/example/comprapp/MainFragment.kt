@@ -31,7 +31,7 @@ import java.io.ByteArrayOutputStream
 * */
 class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fragment_main) {
     private var lastPurchase = mutableListOf<PurchaseModel>()
-    private var mode = true
+    private var mode = false
     private lateinit var database: Database
     private lateinit var viewBinding: FragmentMainBinding
     private lateinit var temp_barcode: String
@@ -44,12 +44,9 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         viewBinding = FragmentMainBinding.inflate(layoutInflater)
         val fab_menu = viewBinding.menuFab
         val rvPurchase = viewBinding.rvPurchase
-        val modeText = viewBinding.mode
-        modeText.text = "Modo: Seguimiento"
 
         if(action == MainFragmentAction.HOME){
             viewBinding.textViewRv.text = "Ultima compra"
-            modeText.visibility = View.GONE
             fab_menu.visibility = View.GONE
             viewBinding.changeMode.visibility = View.GONE
             if(database.getLastPurchase() != null){
@@ -60,9 +57,11 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         }
 
         if(action == MainFragmentAction.ADD){
-            viewBinding.textViewRv.text = "Nueva compra"
+            if(mode)
+                viewBinding.textViewRv.text = "Comprando"
+            else
+                viewBinding.textViewRv.text = "Planificando"
             fab_menu.visibility = View.VISIBLE
-            modeText.visibility = View.VISIBLE
             viewBinding.changeMode.visibility = View.VISIBLE
 
             fab_menu.findViewById<FloatingActionButton>(R.id.fab_done).setOnClickListener{
@@ -88,28 +87,14 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
             changeMode()
             clearList()
             if(mode){
-                viewBinding.mode.text = "Modo: Seguimiento"
-                Toast.makeText(context,"Se ha cambiado el modo a 'Seguimiento de compra'", Toast.LENGTH_LONG).show()
+                viewBinding.textViewRv.text = "Comprando"
             }
             else{
-                viewBinding.mode.text = "Modo: Futura"
-                Toast.makeText(context,"Se ha cambiado el modo a 'Futura compra'", Toast.LENGTH_LONG).show()
+                viewBinding.textViewRv.text = "Planificando"
             }
         }
         viewBinding.changeMode.setOnLongClickListener {
             Toast.makeText(context,"Cambiar modo", Toast.LENGTH_SHORT)
-            true
-        }
-
-        viewBinding.loadFile.setOnClickListener {
-            if(database.getLastPurchase() != null){
-                lastPurchase = database.getLastPurchase()!!
-                viewBinding.rvPurchase.adapter?.notifyItemRangeInserted(0,lastPurchase.size)
-                updateTotalPrice()
-            }
-        }
-        viewBinding.loadFile.setOnLongClickListener {
-            Toast.makeText(context,"Cargar última compra", Toast.LENGTH_SHORT)
             true
         }
 
@@ -175,7 +160,7 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
                                     val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
                                     temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-                                    lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode, viewBinding.productPrice.text.toString()))
+                                    lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode, 1, viewBinding.productPrice.text.toString()))
                                     viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
                                     if(mode){
                                         updateTotalPrice()
@@ -191,7 +176,7 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
                         val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
                         temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-                        lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode,viewBinding.productPrice.text.toString()))
+                        lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode, 1, viewBinding.productPrice.text.toString()))
                         viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
                         if(mode){
                             updateTotalPrice()
@@ -263,9 +248,9 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
     private fun updateTotalPrice(){
         var total = 0.0
         lastPurchase.forEach {
-            total += if(it.price.contains(",")) it.price.replace(",",".").toFloat() else it.price.toFloat()
+            total += if(it.price.contains(",")) it.price.replace(",",".").toFloat() * it.quantity else it.price.toFloat() * it.quantity
         }
-        viewBinding.sumPriceNum.text = String.format("%.2f",total).toString()
+        viewBinding.sumPriceNum.text = String.format("%.2f",total) + "€"
     }
 
     /**

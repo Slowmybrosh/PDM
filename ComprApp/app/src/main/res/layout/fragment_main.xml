@@ -45,15 +45,6 @@
         app:layout_constraintStart_toEndOf="@+id/text_view_rv"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/load_file"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
-        android:src="@drawable/ic_load_foreground"
-        app:layout_constraintStart_toEndOf="@id/change_mode"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/text_view_rv"
         android:layout_width="wrap_content"
@@ -98,31 +89,25 @@
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     <TextView
-        android:id="@+id/mode"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/sum_price"/>
-
-    <TextView
         android:id="@+id/sum_price"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:textAlignment="textEnd"
         android:text="Precio total:"
         android:textSize="25dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sum_price_num"/>
 
     <TextView
         android:id="@+id/sum_price_num"
-        android:layout_width="75dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:textAlignment="center"
         android:paddingRight="10dp"
         android:textSize="25dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
