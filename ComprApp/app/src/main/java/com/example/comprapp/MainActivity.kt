@@ -19,15 +19,13 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val main = MainFragment(MainFragmentAction.HOME)
         val add = MainFragment(MainFragmentAction.ADD)
-        val history = HistoryFragment()
+        val history = HistoryFragment(add)
 
-        setCurrentFragment(main)
+        setCurrentFragment(add)
 
         viewBinding.footer.setOnItemSelectedListener {
             when(it.itemId){
-                R.id.home -> setCurrentFragment(main)
                 R.id.settings -> setCurrentFragment(history) //TODO cambiar icono y nombre
                 R.id.add -> setCurrentFragment(add)
             }

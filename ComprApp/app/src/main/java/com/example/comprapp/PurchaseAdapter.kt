@@ -46,7 +46,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         viewHolder.quantity.text = purchase.quantity.toString()
         viewHolder.priceTextView.text = if(purchase.price != "-1") purchase.price + "€" else ""
         viewHolder.deleteButton.setOnClickListener{
-            if(purchase.quantity != 1){
+            if(purchase.quantity > 1){
                 purchase.quantity--
                 notifyItemChanged(viewHolder.adapterPosition)
             } else {
@@ -67,6 +67,11 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         viewHolder.add_item.setOnLongClickListener {
             Toast.makeText(viewHolder.itemView.context, "Duplicar elemento", Toast.LENGTH_SHORT)
             true
+        }
+
+        if(action == MainFragmentAction.HOME){
+            viewHolder.add_item.visibility = View.INVISIBLE
+            viewHolder.deleteButton.visibility = View.GONE
         }
     }
 

@@ -21,7 +21,7 @@ import java.util.*
  * @param history lista de ficheros con compras pasadas
  * @param context contexto de la aplicación
  */
-class HistoryAdapter(private val history: MutableList<File>, private val context : Context?) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
+class HistoryAdapter(private val history: MutableList<File>, private val context : Context?, private val main: MainFragment) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
     private lateinit var database : Database
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -55,6 +55,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
             popup.isOutsideTouchable = true
             popup.showAtLocation(detailView, Gravity.CENTER, 0, 0)
             detailView.findViewById<Button>(R.id.popup_window_button).setOnClickListener{
+                main.setPurchase(detailPurchase)
                 popup.dismiss()
             }
             true

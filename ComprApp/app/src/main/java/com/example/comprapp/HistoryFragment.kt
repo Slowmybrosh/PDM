@@ -15,7 +15,7 @@ import com.example.comprapp.databinding.FragmentSecondBinding
  * @param viewBinding contiene la vista para acceder rápidamente a los elementos de la misma
  */
 
-class HistoryFragment:Fragment(R.layout.fragment_second) {
+class HistoryFragment(private val main: MainFragment):Fragment(R.layout.fragment_second) {
     private lateinit var viewBinding: FragmentSecondBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -27,7 +27,7 @@ class HistoryFragment:Fragment(R.layout.fragment_second) {
         val rvHistory = viewBinding.rvHistory
 
         rvHistory.layoutManager = LinearLayoutManager(context)
-        rvHistory.adapter = HistoryAdapter(database.getAllPurchases(), context)
+        rvHistory.adapter = HistoryAdapter(database.getAllPurchases(), context, main)
 
         return viewBinding.root
     }

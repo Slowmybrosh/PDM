@@ -105,46 +105,53 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_BARCODE && resultCode == Activity.RESULT_OK){
             temp_barcode = data!!.data.toString()
-            viewBinding.productName.text = ""
-            viewBinding.productImageUrl.text = ""
-            database.searchBarcode(temp_barcode, viewBinding, object: VolleyCallback{
-                override fun onSuccess(action: String) {
-                    super.onSuccess(action)
-                    if(!mode){
-                        if(viewBinding.productImageUrl.text.toString() != ""){
-                            database.requestProductImage(viewBinding.productImageUrl.text.toString(), viewBinding, object: VolleyCallback{
-                                override fun onSuccess(action: String) {
-                                    if(action == "Imagen"){
-                                        val byteArrayOutputStream = ByteArrayOutputStream()
-                                        viewBinding.productImage.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                                        val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
-                                        temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            val isOnList = checkOnList(temp_barcode)
+            if(isOnList == null){
+                viewBinding.productName.text = ""
+                viewBinding.productImageUrl.text = ""
+                database.searchBarcode(temp_barcode, viewBinding, object: VolleyCallback{
+                    override fun onSuccess(action: String) {
+                        super.onSuccess(action)
+                        if(!mode){
+                            if(viewBinding.productImageUrl.text.toString() != ""){
+                                database.requestProductImage(viewBinding.productImageUrl.text.toString(), viewBinding, object: VolleyCallback{
+                                    override fun onSuccess(action: String) {
+                                        if(action == "Imagen"){
+                                            val byteArrayOutputStream = ByteArrayOutputStream()
+                                            viewBinding.productImage.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                                            val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+                                            temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-                                        lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode))
+                                            lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode))
 
-                                        viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
+                                            viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
+                                        }
                                     }
-                                }
-                            })
-                        } else{
-                            val d = resources.getDrawable(R.drawable.ic_default_foreground)
-                            viewBinding.productImage.setImageDrawable(d)
-                            val byteArrayOutputStream = ByteArrayOutputStream()
-                            viewBinding.productImage.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                            val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
-                            temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
+                                })
+                            } else{
+                                val d = resources.getDrawable(R.drawable.ic_default_foreground)
+                                viewBinding.productImage.setImageDrawable(d)
+                                val byteArrayOutputStream = ByteArrayOutputStream()
+                                viewBinding.productImage.drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                                val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+                                temp_image = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-                            lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode))
-                            viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
+                                lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode))
+                                viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
+                            }
                         }
                     }
-                }
-            })
+                })
 
-            if(mode){
-                val intent = Intent(activity, Camera::class.java)
-                intent.putExtra("action", CameraAction.PRICE)
-                startActivityForResult(intent, REQUEST_PRICE)
+                if(mode){
+                    val intent = Intent(activity, Camera::class.java)
+                    intent.putExtra("action", CameraAction.PRICE)
+                    startActivityForResult(intent, REQUEST_PRICE)
+                }
+            } else {
+                lastPurchase[isOnList].quantity++
+                viewBinding.rvPurchase.adapter?.notifyItemChanged(isOnList)
+                updateTotalPrice()
             }
         }
         if(requestCode == REQUEST_PRICE && resultCode == Activity.RESULT_OK){
@@ -253,6 +260,11 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         viewBinding.sumPriceNum.text = String.format("%.2f",total) + "€"
     }
 
+    fun setPurchase(purchase : MutableList<PurchaseModel>){
+        lastPurchase = purchase
+        viewBinding.rvPurchase.adapter?.notifyItemRangeInserted(0,lastPurchase.size)
+    }
+
     /**
      * Limpia la lista de items y resetea el textView que muestra el precio
      */
@@ -260,6 +272,14 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         lastPurchase.clear()
         viewBinding.rvPurchase.adapter?.notifyItemRangeRemoved(0, lastPurchase.size)
         viewBinding.sumPriceNum.text = "0.0"
+    }
+
+    private fun checkOnList(barcode : String) : Int? {
+        lastPurchase.forEach{
+            if(it.barcode == barcode)
+                return lastPurchase.indexOf(it)
+        }
+        return null
     }
 
     /**
