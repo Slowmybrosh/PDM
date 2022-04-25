@@ -45,17 +45,6 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         val fab_menu = viewBinding.menuFab
         val rvPurchase = viewBinding.rvPurchase
 
-        if(action == MainFragmentAction.HOME){
-            viewBinding.textViewRv.text = "Ultima compra"
-            fab_menu.visibility = View.GONE
-            viewBinding.changeMode.visibility = View.GONE
-            if(database.getLastPurchase() != null){
-                lastPurchase = database.getLastPurchase()!!
-                updateTotalPrice()
-            }
-
-        }
-
         if(action == MainFragmentAction.ADD){
             if(mode)
                 viewBinding.textViewRv.text = "Comprando"
@@ -85,7 +74,6 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
 
         viewBinding.changeMode.setOnClickListener {
             changeMode()
-            clearList()
             if(mode){
                 viewBinding.textViewRv.text = "Comprando"
             }
@@ -250,6 +238,15 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
     }
 
     /**
+     * Función que permite especificar un modo de seguimiento
+     *
+     * @param mode boolean. True para modo "comprando" y false para modo "planificando"
+     */
+    fun setMode(mode : Boolean){
+        this.mode = mode
+    }
+
+    /**
      * Actualiza el textView con el precio de la compra actual
      */
     private fun updateTotalPrice(){
@@ -260,6 +257,11 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         viewBinding.sumPriceNum.text = String.format("%.2f",total) + "€"
     }
 
+    /**
+     * Permite seguir el curso de una compra planificada con anterioridad, cargada desde el historial
+     *
+     * @param purchase lista de productos
+     */
     fun setPurchase(purchase : MutableList<PurchaseModel>){
         lastPurchase = purchase
         viewBinding.rvPurchase.adapter?.notifyItemRangeInserted(0,lastPurchase.size)
@@ -274,6 +276,12 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         viewBinding.sumPriceNum.text = "0.0"
     }
 
+    /**
+     * Función que permite comprobar si un producto se encuentra en la cesta
+     *
+     * @param barcode código de barras del producto a comprobar en la cesta
+     * @return el indice del producto en la cesta o null si no está
+     */
     private fun checkOnList(barcode : String) : Int? {
         lastPurchase.forEach{
             if(it.barcode == barcode)

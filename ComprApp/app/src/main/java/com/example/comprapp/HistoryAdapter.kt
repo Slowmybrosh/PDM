@@ -56,6 +56,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
             popup.showAtLocation(detailView, Gravity.CENTER, 0, 0)
             detailView.findViewById<Button>(R.id.popup_window_button).setOnClickListener{
                 main.setPurchase(detailPurchase)
+                main.setMode(true)
                 popup.dismiss()
             }
             true

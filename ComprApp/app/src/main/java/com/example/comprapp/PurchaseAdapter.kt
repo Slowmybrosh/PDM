@@ -28,6 +28,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         val deleteButton = itemView.findViewById<ImageButton>(R.id.delete)
         val add_item = itemView.findViewById<ImageButton>(R.id.add_one)
         val quantity = itemView.findViewById<TextView>(R.id.quantity)
+        val text_quantity = itemView.findViewById<TextView>(R.id.text_quantity)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseAdapter.ViewHolder {
@@ -44,7 +45,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         viewHolder.nameTextView.text = purchase.name
         viewHolder.imageView.setImageBitmap(BitmapFactory.decodeByteArray(decoded64, 0, decoded64.size))
         viewHolder.quantity.text = purchase.quantity.toString()
-        viewHolder.priceTextView.text = if(purchase.price != "-1") purchase.price + "€" else ""
+        viewHolder.priceTextView.text = if(purchase.price != "0") purchase.price + "€" else ""
         viewHolder.deleteButton.setOnClickListener{
             if(purchase.quantity > 1){
                 purchase.quantity--
@@ -72,6 +73,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         if(action == MainFragmentAction.HOME){
             viewHolder.add_item.visibility = View.INVISIBLE
             viewHolder.deleteButton.visibility = View.GONE
+            viewHolder.text_quantity.visibility = View.GONE
         }
     }
 
