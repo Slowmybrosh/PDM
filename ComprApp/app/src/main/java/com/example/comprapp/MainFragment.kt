@@ -36,6 +36,7 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
     private lateinit var viewBinding: FragmentMainBinding
     private lateinit var temp_barcode: String
     private lateinit var temp_image: String
+    private var lastBarcodePressed: String = ""
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -50,8 +51,6 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
                 viewBinding.textViewRv.text = "Comprando"
             else
                 viewBinding.textViewRv.text = "Planificando"
-            fab_menu.visibility = View.VISIBLE
-            viewBinding.changeMode.visibility = View.VISIBLE
 
             fab_menu.findViewById<FloatingActionButton>(R.id.fab_done).setOnClickListener{
                 database.savePurchase(lastPurchase)
@@ -65,10 +64,16 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
         }
 
         rvPurchase.layoutManager = LinearLayoutManager(context)
-        rvPurchase.adapter = PurchaseAdapter(lastPurchase, action, object: UpdateList{
+        rvPurchase.adapter = PurchaseAdapter(lastPurchase, action,object : UpdateList{
             override fun itemChanged() {
-                super.itemChanged()
                 updateTotalPrice()
+            }
+
+            override fun updatePriceCallback(barcode: String) {
+                if(mode){
+                    lastBarcodePressed = barcode
+                    updatePrice()
+                }
             }
         })
 
@@ -157,9 +162,7 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
 
                                     lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode, 1, viewBinding.productPrice.text.toString()))
                                     viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
-                                    if(mode){
-                                        updateTotalPrice()
-                                    }
+                                    updateTotalPrice()
                                 }
                             }
                         })
@@ -173,9 +176,22 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
 
                         lastPurchase.add(PurchaseModel(temp_image,viewBinding.productName.text.toString(),temp_barcode, 1, viewBinding.productPrice.text.toString()))
                         viewBinding.rvPurchase.adapter?.notifyItemInserted(lastPurchase.size)
-                        if(mode){
+                        updateTotalPrice()
+                    }
+                }
+            })
+        }
+
+        if(requestCode == UPDATE_PRICE && resultCode == Activity.RESULT_OK){
+            var array = data!!.getStringArrayListExtra("prices")
+            choosePrice(array!!.toMutableList().toTypedArray(),object: ChooserCallback{
+                override fun onSuccess() {
+                    if(lastBarcodePressed != null){
+                        val index = checkOnList(lastBarcodePressed)
+                        if(index != null)
+                            lastPurchase[index].price = viewBinding.productPrice.text.toString()
+                            viewBinding.rvPurchase.adapter?.notifyItemChanged(index!!)
                             updateTotalPrice()
-                        }
                     }
                 }
             })
@@ -291,7 +307,17 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
     }
 
     /**
-     * Interfaz para el Callback para las peticiones en internet
+     * Abre la cámara para actualizar el precio de un producto que se encuentra en la lista
+     *
+     */
+    private fun updatePrice(){
+        val intent = Intent(activity,Camera::class.java)
+        intent.putExtra("action", CameraAction.PRICE)
+        startActivityForResult(intent,UPDATE_PRICE)
+    }
+
+    /**
+     * Interfaz para el Callback de peticiones HTTP
      */
     interface VolleyCallback {
         fun onSuccess(action: String){
@@ -309,12 +335,14 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
     /**
      * Interfaz para la actualización de la lista
      */
-    interface UpdateList{
+    interface UpdateList {
         fun itemChanged(){}
+        fun updatePriceCallback(barcode: String){}
     }
 
     companion object{
         val REQUEST_BARCODE = 15
         val REQUEST_PRICE = 16
+        val UPDATE_PRICE = 17
     }
 }

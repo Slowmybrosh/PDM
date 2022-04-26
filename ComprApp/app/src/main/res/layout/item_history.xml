@@ -26,12 +26,12 @@
             android:text="Esto es un sample para el precio"/>
     </LinearLayout>
 
-    <ImageButton
+    <ImageView
         android:id="@+id/delete_history"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="100dp"
-        android:src="@drawable/ic_delete_foreground"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="150dp"
+        android:src="@drawable/ic_baseline_delete_50"
         />
 
 </LinearLayout>

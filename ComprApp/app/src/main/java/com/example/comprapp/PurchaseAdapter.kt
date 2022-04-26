@@ -70,6 +70,10 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
             true
         }
 
+        viewHolder.itemView.setOnClickListener{
+            callback.updatePriceCallback(groceries[viewHolder.adapterPosition].barcode)
+        }
+
         if(action == MainFragmentAction.HOME){
             viewHolder.add_item.visibility = View.INVISIBLE
             viewHolder.deleteButton.visibility = View.GONE

@@ -79,13 +79,13 @@
             android:id="@+id/fab_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_icon="@drawable/ic_done_foreground"/>
+            fab:fab_icon="@drawable/ic_baseline_done_50"/>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add"
             android:layout_width="2dp"
             android:layout_height="2dp"
-            fab:fab_icon="@drawable/ic_add_foreground"/>
+            fab:fab_icon="@drawable/ic_baseline_add_50"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     <TextView
