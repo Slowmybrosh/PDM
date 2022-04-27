@@ -205,23 +205,24 @@ class MainFragment(private val action: MainFragmentAction):Fragment(R.layout.fra
      * @param callback Objeto de la clase ChooserCallback, al elegir el precio permite notificar la continuación de la construcción del item
      */
     private fun choosePrice(prices: Array<String>, callback: ChooserCallback){
-        prices[prices.size - 1] = "No está el precio"
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Selecciona el precio")
+        if(prices.isNotEmpty()){
+            prices[prices.size - 1] = "No está el precio"
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Selecciona el precio")
 
-        builder.setItems(prices) { dialog, which ->
-            if(which == prices.size - 1){
-                dialog.dismiss()
-                manualPriceSelector(callback)
-            } else{
-                viewBinding.productPrice.text = prices[which]
-                callback.onSuccess()
+            builder.setItems(prices) { dialog, which ->
+                if(which == prices.size - 1){
+                    dialog.dismiss()
+                    manualPriceSelector(callback)
+                } else{
+                    viewBinding.productPrice.text = prices[which]
+                    callback.onSuccess()
+                }
             }
+
+            val dialog = builder.create()
+            dialog.show()
         }
-
-
-        val dialog = builder.create()
-        dialog.show()
     }
 
     /**

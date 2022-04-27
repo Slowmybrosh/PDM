@@ -92,7 +92,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
      */
     private fun parseName(archivo: File) : String{
         var date = Date(archivo.lastModified())
-        val format = SimpleDateFormat("dd-MMMM-yyyy")
+        val format = SimpleDateFormat("dd-MMMM-yyyy HH:mm:ss")
 
         return format.format(date).replace("-"," ")
     }

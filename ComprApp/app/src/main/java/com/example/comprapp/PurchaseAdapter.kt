@@ -47,7 +47,7 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         viewHolder.quantity.text = purchase.quantity.toString()
         viewHolder.priceTextView.text = if(purchase.price != "0") purchase.price + "€" else ""
         viewHolder.deleteButton.setOnClickListener{
-            if(purchase.quantity > 1){
+            if(purchase.quantity > 0){
                 purchase.quantity--
                 notifyItemChanged(viewHolder.adapterPosition)
             } else {
