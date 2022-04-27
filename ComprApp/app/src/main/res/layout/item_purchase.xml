@@ -15,47 +15,77 @@
         android:layout_marginRight="10dp" />
 
     <LinearLayout
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <TextView
+                style="@style/FontTheme"
                 android:id="@+id/purchase_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
                 android:text="sample text" />
 
         </LinearLayout>
 
         <TextView
+            style="@style/priceText"
             android:id="@+id/purchase_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15dp"
             android:text="sample text" />
 
 
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/delete"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="25dp"
-        android:src="@drawable/ic_delete_foreground" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/add_one"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="25dp"
-        android:src="@drawable/ic_copy_foreground" />
+        <TextView
+            android:id="@+id/text_quantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Cantidad"
+            android:textSize="15dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/delete"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/ic_baseline_remove_50" />
+
+            <TextView
+                android:id="@+id/quantity"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginHorizontal="5dp"
+                android:text="15"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:gravity="center"
+                />
+
+            <ImageButton
+                android:id="@+id/add_one"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_baseline_add_50" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

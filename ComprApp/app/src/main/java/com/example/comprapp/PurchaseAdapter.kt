@@ -27,6 +27,8 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         val imageView = itemView.findViewById<ImageView>(R.id.purchase_image)
         val deleteButton = itemView.findViewById<ImageButton>(R.id.delete)
         val add_item = itemView.findViewById<ImageButton>(R.id.add_one)
+        val quantity = itemView.findViewById<TextView>(R.id.quantity)
+        val text_quantity = itemView.findViewById<TextView>(R.id.text_quantity)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PurchaseAdapter.ViewHolder {
@@ -42,10 +44,16 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
         val decoded64 = Base64.decode(purchase.image_base64, Base64.DEFAULT)
         viewHolder.nameTextView.text = purchase.name
         viewHolder.imageView.setImageBitmap(BitmapFactory.decodeByteArray(decoded64, 0, decoded64.size))
-        viewHolder.priceTextView.text = if(purchase.price != "-1") purchase.price else ""
+        viewHolder.quantity.text = purchase.quantity.toString()
+        viewHolder.priceTextView.text = if(purchase.price != "0") purchase.price + "€" else ""
         viewHolder.deleteButton.setOnClickListener{
-            groceries.remove(groceries[viewHolder.adapterPosition])
-            notifyItemRemoved(viewHolder.adapterPosition)
+            if(purchase.quantity > 0){
+                purchase.quantity--
+                notifyItemChanged(viewHolder.adapterPosition)
+            } else {
+                groceries.remove(groceries[viewHolder.adapterPosition])
+                notifyItemRemoved(viewHolder.adapterPosition)
+            }
             callback.itemChanged()
         }
         viewHolder.deleteButton.setOnLongClickListener {
@@ -53,13 +61,23 @@ class PurchaseAdapter(private var groceries: MutableList<PurchaseModel>, private
             true
         }
         viewHolder.add_item.setOnClickListener{
-            groceries.add(groceries[viewHolder.adapterPosition])
-            notifyItemInserted(groceries.size)
+            purchase.quantity++
+            notifyItemChanged(viewHolder.adapterPosition)
             callback.itemChanged()
         }
         viewHolder.add_item.setOnLongClickListener {
             Toast.makeText(viewHolder.itemView.context, "Duplicar elemento", Toast.LENGTH_SHORT)
             true
+        }
+
+        viewHolder.itemView.setOnClickListener{
+            callback.updatePriceCallback(groceries[viewHolder.adapterPosition].barcode)
+        }
+
+        if(action == MainFragmentAction.HOME){
+            viewHolder.add_item.visibility = View.INVISIBLE
+            viewHolder.deleteButton.visibility = View.GONE
+            viewHolder.text_quantity.visibility = View.GONE
         }
     }
 

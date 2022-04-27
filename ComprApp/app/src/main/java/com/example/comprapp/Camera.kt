@@ -84,13 +84,10 @@ class Camera : AppCompatActivity() {
                         CameraAction.PRICE -> {
                             val recognizedText = scanner.analyzeText(image,image.imageInfo.rotationDegrees)
                             image.close()
-                            if (recognizedText != null) {
-
-                                val array: ArrayList<String> = ArrayList(recognizedText.asList())
-                                data.putStringArrayListExtra("prices",array)
-                                setResult(RESULT_OK,data)
-                                finish()
-                            }
+                            val array: ArrayList<String> = ArrayList(recognizedText.asList())
+                            data.putStringArrayListExtra("prices",array)
+                            setResult(RESULT_OK,data)
+                            finish()
                         }
                     }
                 }

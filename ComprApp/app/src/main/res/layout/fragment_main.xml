@@ -8,50 +8,39 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/product_name"
+        android:id="@+id/productName"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:textSize="50dp"
         tools:ignore="MissingConstraints"/>
 
     <TextView
-        android:id="@+id/product_price"
+        android:id="@+id/productImageUrl"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:textSize="50dp"
         tools:ignore="MissingConstraints"/>
 
     <TextView
-        android:id="@+id/product_image_url"
+        android:id="@+id/productPrice"
         android:layout_width="0dp"
         android:layout_height="0dp"
         tools:ignore="MissingConstraints" />
 
     <ImageView
-        android:id="@+id/product_image"
+        android:id="@+id/productImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
         tools:ignore="MissingConstraints" />
 
     <ImageButton
-        android:id="@+id/change_mode"
+        android:id="@+id/changeMode"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="27dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="25dp"
         android:src="@drawable/ic_change_foreground"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.335"
-        app:layout_constraintStart_toEndOf="@+id/text_view_rv"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/load_file"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="20dp"
-        android:src="@drawable/ic_load_foreground"
-        app:layout_constraintStart_toEndOf="@id/change_mode"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -73,7 +62,7 @@
         app:layout_constraintTop_toBottomOf="@+id/text_view_rv" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/menu_fab"
+        android:id="@+id/menuFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start|bottom"
@@ -88,41 +77,34 @@
             android:id="@+id/fab_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            fab:fab_icon="@drawable/ic_done_foreground"/>
+            fab:fab_icon="@drawable/ic_baseline_done_50"/>
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add"
             android:layout_width="2dp"
             android:layout_height="2dp"
-            fab:fab_icon="@drawable/ic_add_foreground"/>
+            fab:fab_icon="@drawable/ic_baseline_add_50"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
     <TextView
-        android:id="@+id/mode"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/sum_price"/>
-
-    <TextView
         android:id="@+id/sum_price"
-        android:layout_width="150dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:textAlignment="textEnd"
         android:text="Precio total:"
         android:textSize="25dp"
+        android:textStyle="bold"
+        android:layout_marginLeft="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sum_price_num"/>
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/sum_price_num"
-        android:layout_width="75dp"
+        android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:textAlignment="center"
         android:paddingRight="10dp"
         android:textSize="25dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

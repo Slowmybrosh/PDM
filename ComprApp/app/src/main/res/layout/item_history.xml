@@ -12,26 +12,26 @@
         android:orientation="vertical"
         android:layout_marginLeft="20dp">
         <TextView
+            style="@style/FontTheme"
             android:id="@+id/date_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
             android:text="Sample text"/>
 
         <TextView
+            style="@style/priceText"
             android:id="@+id/total_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
             android:text="Esto es un sample para el precio"/>
     </LinearLayout>
 
-    <ImageButton
+    <ImageView
         android:id="@+id/delete_history"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="10dp"
-        android:src="@drawable/ic_delete_foreground" />
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginLeft="90dp"
+        android:src="@drawable/ic_baseline_delete_50"
+        />
 
 </LinearLayout>

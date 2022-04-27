@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -20,13 +21,13 @@ import java.util.*
  * @param history lista de ficheros con compras pasadas
  * @param context contexto de la aplicación
  */
-class HistoryAdapter(private val history: MutableList<File>, private val context : Context?) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
+class HistoryAdapter(private val history: MutableList<File>, private val context : Context?, private val main: MainFragment) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
     private lateinit var database : Database
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dateTextView = itemView.findViewById<TextView>(R.id.date_name)
         val priceTextView = itemView.findViewById<TextView>(R.id.total_price)
-        val deleteButton = itemView.findViewById<ImageButton>(R.id.delete_history)
+        val deleteButton = itemView.findViewById<ImageView>(R.id.delete_history)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryAdapter.ViewHolder {
@@ -54,16 +55,17 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
             popup.isOutsideTouchable = true
             popup.showAtLocation(detailView, Gravity.CENTER, 0, 0)
             detailView.findViewById<Button>(R.id.popup_window_button).setOnClickListener{
+                main.setPurchase(detailPurchase)
                 popup.dismiss()
             }
             true
         }
         viewHolder.dateTextView.text = parseName(purchase)
-        viewHolder.priceTextView.text = if (getTotalPrice(purchase) > 0) String.format("%.2f",getTotalPrice(purchase)) else "Futura compra"
+        viewHolder.priceTextView.text = if (getTotalPrice(purchase) > 0) String.format("%.2f",getTotalPrice(purchase)) + "€" else "Planificada"
         viewHolder.deleteButton.setOnClickListener{
             if(removeFile(history[viewHolder.adapterPosition])){
-                history.remove(history[viewHolder.adapterPosition])
-                notifyItemRemoved(viewHolder.adapterPosition)
+                    history.remove(history[viewHolder.adapterPosition])
+                    notifyItemRemoved(viewHolder.adapterPosition)
             }
         }
         viewHolder.deleteButton.setOnLongClickListener {
@@ -89,7 +91,10 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
      * @return la fecha cuando se realizó la compra
      */
     private fun parseName(archivo: File) : String{
-        return Date(archivo.lastModified()).toString()
+        var date = Date(archivo.lastModified())
+        val format = SimpleDateFormat("dd-MMMM-yyyy HH:mm:ss")
+
+        return format.format(date).replace("-"," ")
     }
 
     /**
@@ -118,7 +123,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Eliminar compra")
         builder.setMessage("¿Está seguro de que quiere eliminar la compra?")
-        builder.setPositiveButton("Si"){_,_ -> database.removeFile(archivo)}
+        builder.setPositiveButton("Si"){_,_ ->database.removeFile(archivo)}
         builder.setNegativeButton("No") {_,_ ->}
 
         val alertDialog = builder.create()

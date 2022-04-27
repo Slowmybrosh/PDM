@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="FontTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="android:textSize">22sp</item>
+    </style>
+    <style name="priceText">
+        <item name="android:textSize">22sp</item>
+    </style>
+</resources>
