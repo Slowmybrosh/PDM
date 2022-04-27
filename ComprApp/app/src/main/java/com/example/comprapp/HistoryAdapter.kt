@@ -107,7 +107,7 @@ class HistoryAdapter(private val history: MutableList<File>, private val context
         var total = 0.0
 
         purchase.forEach {
-            total += if(it.price.contains(",")) it.price.replace(",",".").toFloat() else it.price.toFloat()
+            total += if(it.price.contains(",")) it.price.replace(",",".").toFloat() * it.quantity else it.price.toFloat() * it.quantity
 
         }
 
